@@ -31,11 +31,17 @@ function absoluteUri(base, href) {
 
 }
 
-function globalPageTests(test) {
-  test.assertHttpStatus(200);
-  test.assertExists('title');
-  test.assertDoesntExist('.warning');
-  test.assertDoesntExist('.error');
-  test.assertDoesntExist('.node-unpublished');
-  test.assertTextDoesntExist('PHP Fatal', 'page body does not contain "PHP Fatal"');
+function globalPageTests(casp) {
+  casp.test.assertHttpStatus(200);
+  casp.test.assertExists('title');
+  casp.test.assertDoesntExist('.warning');
+  casp.test.assertDoesntExist('.error');
+  casp.test.assertDoesntExist('.node-unpublished');
+  casp.test.assertTextDoesntExist('PHP Fatal', 'page body does not contain "PHP Fatal"');
+
+  // This is the required snippet to send all page views to a communal GA
+  // bucket.
+  //
+  // drush vset googleanalytics_codesnippet_after "ga('create', 'UA-54970022-1', 'auto', {'name': 'govcms'}); ga('govcms.send', 'pageview', {'anonymizeIp': true});"
+  casp.test.assertMatch(casp.getPageContent(), /.*UA-54970022-1.*/i, 'page body does contain "UA-54970022-1"');
 }

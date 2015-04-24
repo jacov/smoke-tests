@@ -17,7 +17,8 @@ casper.options.viewportSize = {
 casper.on('resource.error', function(resource) {
   if (!resource.url.match(/google-analytics\.com/) &&
     !resource.url.match(/fonts\.net/) &&
-    !resource.url.match(/twimg\.net/)
+    !resource.url.match(/twimg\.net/) &&
+    !resource.url.match(/twitter\.com/)
   ) {
     this.echo(resource.url + " not found.", "RED_BAR");
   }
@@ -30,14 +31,14 @@ casper.on('open', function (location) {
 var sites = casper.cli.get("sites").split(" ");
 var siteURLs = [];
 var limit = ~~casper.cli.get("limit") || 20;
-var numberOfSuccess = 6 * limit + 6;
+var numberOfSuccess = 7 * limit + 7;
 
 casper.each(sites, function (self, site) {
   casper.test.begin('Testing ' + site, numberOfSuccess, function suite(test) {
     casper.start(site, function() {
       siteURLs = [];
       this.echo(this.getTitle());
-      globalPageTests(test);
+      globalPageTests(this);
 
       var links = this.evaluate(function() {
         links = document.getElementsByTagName('a');
@@ -62,6 +63,11 @@ casper.each(sites, function (self, site) {
           addLink = false;
         }
 
+        // No RSS.
+        else if (link.match(/\.xml$/)) {
+          addLink = false;
+        }
+
         // Ensure this link is on the same domain
         else if (link.match(/^https?:\/\/.*/) && link.indexOf(baseUrl) !== 0) {
           addLink = false;
@@ -82,7 +88,7 @@ casper.each(sites, function (self, site) {
     casper.then(function() {
       casper.each(siteURLs, function(self, link) {
         casper.thenOpen(link, function(a) {
-          globalPageTests(test);
+          globalPageTests(this);
         });
       });
     });
