@@ -1,6 +1,6 @@
 # govCMS smoke tests
 
-This is a script that will load up the homepage of a bunch of sites on either TEST or PROD ACSF, to check for regressions. The ideal is to reduce manual effort by automated these checks as much as we can.
+This is a script that will load up the homepage of a bunch of sites on either TEST or PROD ACSF, to check for regressions. The ideal is to reduce manual effort by automating these checks as much as we can.
 
 ## Installation
 
