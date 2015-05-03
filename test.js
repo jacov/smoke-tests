@@ -30,7 +30,7 @@ casper.on('open', function (location) {
 
 var sites = casper.cli.get("sites").split(" ");
 var siteURLs = [];
-var limit = ~~casper.cli.get("limit") || 20;
+var limit = casper.cli.get("limit") || 20;
 var numberOfSuccess = 7 * limit + 7;
 
 casper.each(sites, function (self, site) {
