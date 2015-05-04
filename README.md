@@ -10,7 +10,7 @@ Next is CasperJS, you can git clone this repo
 
 ```
 git clone https://github.com/n1k0/casperjs.git
-git checkout phantomjs-2
+git checkout master
 ```
 
 Then symlink the bin/casperjs script to <code>/usr/local/bin/casperjs</code>.
@@ -30,6 +30,12 @@ This is simple.
 
 ```
 ./run.sh
+```
+
+You can also test the TEST ACSF instance with
+
+```
+./run.sh -e=TEST
 ```
 
 CasperJS will report success or failure at the end of the test run. Tests can take upwards of 1 minute to run (depending on site speed).
