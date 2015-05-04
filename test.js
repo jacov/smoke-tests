@@ -2,9 +2,11 @@ var fs = require('fs');
 var utils = require('utils');
 
 casper.options.verbose = true;
-casper.options.logLevel = 'error'; // debug
-casper.options.timeout = 120 * 1000;
+casper.options.logLevel = 'error'; // debug.
+casper.options.exitOnError = false; // Keep going on error.
+casper.options.timeout = 10 * 60 * 1000; // 10 minutes.
 casper.options.pageSettings = {
+  javascriptEnabled: true,
   loadImages: true,
   loadPlugins: false,
   userAgent: 'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.2 Safari/537.36'
@@ -14,28 +16,44 @@ casper.options.viewportSize = {
   height: 800
 };
 
+// HTML logging.
+casper.on('open', function (location) {
+  this.echo(location + ' opened');
+});
+
+// Catch JS errors on the page.
+casper.on('page.error', function(msg, trace) {
+  this.test.fail('JavaScript Error: ' + msg);
+});
+
+// Catch load errors for the page resources.
 casper.on('resource.error', function(resource) {
-  if (!resource.url.match(/google-analytics\.com/) &&
-    !resource.url.match(/fonts\.net/) &&
-    !resource.url.match(/twimg\.net/) &&
-    !resource.url.match(/twitter\.com/)
+  if (!resource.url.match(/.*google-analytics\.com.*/) &&
+    !resource.url.match(/.*fonts\.net.*/) &&
+    !resource.url.match(/.*pbs\.twimg\.com.*/) &&
+    !resource.url.match(/.*twitter\.com.*/)
   ) {
     this.echo(resource.url + " not found.", "RED_BAR");
   }
 });
 
-casper.on('open', function (location) {
-  this.echo(location + ' opened');
+// Do not track CasperJS in GA.
+casper.on('page.resource.requested', function(requestData, request) {
+  if (requestData.url.match(/google-analytics\.com/)) {
+    casper.echo('Request to GA. Aborting: ' + requestData.url);
+    request.abort();
+  }
 });
 
 var sites = casper.cli.get("sites").split(" ");
 var siteURLs = [];
 var limit = casper.cli.get("limit") || 20;
-var numberOfSuccess = 7 * limit + 7;
+var timestamp = casper.cli.get("timestamp") || 1;
+var numberOfSuccess = 8 * limit + 8;
 
 casper.each(sites, function (self, site) {
   casper.test.begin('Testing ' + site, numberOfSuccess, function suite(test) {
-    casper.start(site, function() {
+    casper.start(site + '?cache=' + timestamp, function() {
       siteURLs = [];
       this.echo(this.getTitle());
       globalPageTests(this);
@@ -46,6 +64,15 @@ casper.each(sites, function (self, site) {
           return link.getAttribute('href');
         });
         return links;
+      });
+
+      // Add common URLs to the front of the stack.
+      var commonUrls = [
+        '/user/login',
+        '/search/site/government',
+      ];
+      Array.prototype.forEach.call(commonUrls, function(link) {
+        links.unshift(link);
       });
 
       // Add newly found URLs to the stack
@@ -87,7 +114,7 @@ casper.each(sites, function (self, site) {
 
     casper.then(function() {
       casper.each(siteURLs, function(self, link) {
-        casper.thenOpen(link, function(a) {
+        casper.thenOpen(link + '?cache=' + timestamp, function(a) {
           globalPageTests(this);
         });
       });

@@ -44,4 +44,7 @@ function globalPageTests(casp) {
   //
   // drush vset googleanalytics_codesnippet_after "ga('create', 'UA-54970022-1', 'auto', {'name': 'govcms'}); ga('govcms.send', 'pageview', {'anonymizeIp': true});"
   casp.test.assertMatch(casp.getPageContent(), /.*UA-54970022-1.*/i, 'page body does contain "UA-54970022-1"');
+
+  // Try to find a fonts.com broken font banner.
+  casp.test.assertDoesntExist('#mti_wfs_colophon', 'No fonts.com banner found');
 }
