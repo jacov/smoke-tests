@@ -2,6 +2,7 @@
 
 TIMESTAMP=$(date +%s)
 ENV="PROD"
+SITES_LIST=""
 
 for i in "$@"
 do
@@ -16,10 +17,19 @@ esac
 done
 
 if [ "${ENV}" == "TEST" ]; then
-    SITES="https://dtodss.test-govcms.acsitefactory.com/ https://govcms.test-govcms.acsitefactory.com/ https://asada.test-govcms.acsitefactory.com/"
+    SITES=($(<./sites/test.sh))
 else
-    SITES="https://www.dto.gov.au/ https://www.govcms.gov.au/ https://www.asada.gov.au/"
+    SITES=($(<./sites/prod.sh))
 fi
 
+# Implode array.
+let i=0
+while (( ${#SITES[@]} > i )); do
+    SITES_LIST="${SITES_LIST} ${SITES[i++]}"
+done
+
+# Trim.
+SITES_LIST="$(echo -e "${SITES_LIST}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+
 # Kick off CasperJS.
-casperjs test test.js --sites="${SITES}" --timestamp=${TIMESTAMP} --ignore-ssl-errors=true --includes=functions.js --xunit=log.xml
+casperjs test test.js --sites="${SITES_LIST}" --timestamp=${TIMESTAMP} --ignore-ssl-errors=true --includes=functions.js --xunit=log.xml

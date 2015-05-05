@@ -49,11 +49,11 @@ var sites = casper.cli.get("sites").split(" ");
 var siteURLs = [];
 var limit = casper.cli.get("limit") || 20;
 var timestamp = casper.cli.get("timestamp") || 1;
-var numberOfSuccess = 8 * limit + 8;
+var numberOfSuccess = 8 * (limit + 1);
 
 casper.each(sites, function (self, site) {
   casper.test.begin('Testing ' + site, numberOfSuccess, function suite(test) {
-    casper.start(site + '?cache=' + timestamp, function() {
+    casper.start(site + '?' + timestamp, function() {
       siteURLs = [];
       this.echo(this.getTitle());
       globalPageTests(this);
@@ -69,7 +69,7 @@ casper.each(sites, function (self, site) {
       // Add common URLs to the front of the stack.
       var commonUrls = [
         '/user/login',
-        '/search/site/government',
+        '/search/government'
       ];
       Array.prototype.forEach.call(commonUrls, function(link) {
         links.unshift(link);
@@ -114,7 +114,7 @@ casper.each(sites, function (self, site) {
 
     casper.then(function() {
       casper.each(siteURLs, function(self, link) {
-        casper.thenOpen(link + '?cache=' + timestamp, function(a) {
+        casper.thenOpen(link + '?' + timestamp, function(a) {
           globalPageTests(this);
         });
       });
