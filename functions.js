@@ -34,16 +34,16 @@ function absoluteUri(base, href) {
 function globalPageTests(casp) {
   casp.test.assertHttpStatus(200);
   casp.test.assertExists('title');
-  casp.test.assertDoesntExist('.warning');
-  casp.test.assertDoesntExist('.error');
-  casp.test.assertDoesntExist('.node-unpublished');
-  casp.test.assertTextDoesntExist('PHP Fatal', 'page body does not contain "PHP Fatal"');
+  casp.test.assertDoesntExist('.warning', 'No Drupal warnings found');
+  casp.test.assertDoesntExist('.error', 'No Drupal errors found');
+  casp.test.assertDoesntExist('.node-unpublished', 'No unpublished nodes found');
+  casp.test.assertTextDoesntExist('PHP Fatal', 'No PHP fatals found');
 
   // This is the required snippet to send all page views to a communal GA
   // bucket.
   //
   // drush vset googleanalytics_codesnippet_after "ga('create', 'UA-54970022-1', 'auto', {'name': 'govcms'}); ga('govcms.send', 'pageview', {'anonymizeIp': true});"
-  casp.test.assertMatch(casp.getPageContent(), /.*UA-54970022-1.*/i, 'page body does contain "UA-54970022-1"');
+  casp.test.assertMatch(casp.getPageContent(), /.*UA-54970022-1.*/i, 'Found the shared Google Analytics tracker');
 
   // Try to find a fonts.com broken font banner.
   casp.test.assertDoesntExist('#mti_wfs_colophon', 'No fonts.com banner found');
