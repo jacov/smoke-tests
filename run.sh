@@ -5,6 +5,10 @@ ENV="PROD"
 SITES_LIST=""
 LOGLEVEL="error"
 
+# Remove any previous test run files.
+rm -f fail.png
+rm -f log.xml
+
 for i in "$@"
 do
 case $i in

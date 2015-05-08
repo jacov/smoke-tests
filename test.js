@@ -45,6 +45,11 @@ casper.on('page.resource.requested', function(requestData, request) {
   }
 });
 
+// Screenshot fails.
+casper.on('step.error', function(failure) {
+  this.capture('fail.png');
+});
+
 var sites = casper.cli.get("sites").split(" ");
 var siteURLs = [];
 var limit = casper.cli.get("limit") || 20;
