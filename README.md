@@ -39,3 +39,11 @@ You can also test the TEST ACSF instance with
 ```
 
 CasperJS will report success or failure at the end of the test run. Tests can take upwards of 1 minute to run (depending on site speed).
+
+## Debug
+
+You can run the script with an optional parameter to get CasperJS debug output.
+
+```
+./run.sh -v
+```

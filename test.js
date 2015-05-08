@@ -2,7 +2,7 @@ var fs = require('fs');
 var utils = require('utils');
 
 casper.options.verbose = true;
-casper.options.logLevel = 'error'; // debug.
+casper.options.logLevel = casper.cli.get("logLevel") || 'debug';
 casper.options.exitOnError = false; // Keep going on error.
 casper.options.timeout = 10 * 60 * 1000; // 10 minutes.
 casper.options.pageSettings = {

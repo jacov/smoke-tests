@@ -3,12 +3,16 @@
 TIMESTAMP=$(date +%s)
 ENV="PROD"
 SITES_LIST=""
+LOGLEVEL="error"
 
 for i in "$@"
 do
 case $i in
     -e=*|--env=*)
     ENV="${i#*=}"
+    ;;
+    -v|--verbose)
+    LOGLEVEL="debug"
     ;;
     *)
     # unknown option
@@ -32,4 +36,4 @@ done
 SITES_LIST="$(echo -e "${SITES_LIST}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
 
 # Kick off CasperJS.
-casperjs test test.js --sites="${SITES_LIST}" --timestamp=${TIMESTAMP} --ignore-ssl-errors=true --includes=functions.js --xunit=log.xml
+casperjs test test.js --sites="${SITES_LIST}" --timestamp=${TIMESTAMP} --logLevel="${LOGLEVEL}" --ignore-ssl-errors=true --includes=functions.js --xunit=log.xml
