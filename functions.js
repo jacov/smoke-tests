@@ -47,4 +47,27 @@ function globalPageTests(casp) {
 
   // Try to find a fonts.com broken font banner.
   casp.test.assertDoesntExist('#mti_wfs_colophon', 'No fonts.com banner found');
+
+  // Caching headers.
+  var foundCacheHeader = false;
+  casp.currentResponse.headers.forEach(function(header) {
+    if (header.name == 'Cache-Control') {
+      foundCacheHeader = true;
+      casp.test.assertMatch(header.value, /public, max-age=\d{3,}/, 'Page is cacheable in Varnish and Akamai');
+      var cacheSecondsMatches = header.value.match(/max-age=(\d+)/);
+      if (cacheSecondsMatches.length > 1) {
+        var cacheSeconds = parseInt(cacheSecondsMatches[1], 10);
+        if (cacheSeconds >= 300) {
+          casp.test.pass('Page cache lifetime is >= than 5 minutes (' + cacheSeconds + ' seconds)');
+        }
+        else {
+          casp.test.fail('Page cache lifetime is < than 5 minutes (' + cacheSeconds + ' seconds)');
+        }
+      }
+    }
+  });
+  if (!foundCacheHeader) {
+    casp.test.fail('Found no "Cache-Control" header');
+    casp.test.fail('Page cache lifetime is < than 5 minutes');
+  }
 }

@@ -54,7 +54,7 @@ var sites = casper.cli.get("sites").split(" ");
 var siteURLs = [];
 var limit = casper.cli.get("limit") || 20;
 var timestamp = casper.cli.get("timestamp") || 1;
-var numberOfSuccess = 8 * (limit + 1);
+var numberOfSuccess = 10 * (limit + 1);
 
 casper.each(sites, function (self, site) {
   casper.test.begin('Testing ' + site, numberOfSuccess, function suite(test) {
