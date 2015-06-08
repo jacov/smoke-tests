@@ -39,35 +39,32 @@ function globalPageTests(casp) {
   casp.test.assertDoesntExist('.node-unpublished', 'No unpublished nodes found');
   casp.test.assertTextDoesntExist('PHP Fatal', 'No PHP fatals found');
 
-  // This is the required snippet to send all page views to a communal GA
-  // bucket.
-  //
-  // drush vset googleanalytics_codesnippet_after "ga('create', 'UA-54970022-1', 'auto', {'name': 'govcms'}); ga('govcms.send', 'pageview', {'anonymizeIp': true});"
-  casp.test.assertMatch(casp.getPageContent(), /.*UA-54970022-1.*/i, 'Found the shared Google Analytics tracker');
+  casp.test.assertMatch(casp.getPageContent(), /.*"6035728".*/i, 'Found the shared ComScore tracker');
+  casp.test.assertMatch(casp.getPageContent(), /.*43887;.*/i, 'Found the shared Chartbeat tracker');
 
   // Try to find a fonts.com broken font banner.
   casp.test.assertDoesntExist('#mti_wfs_colophon', 'No fonts.com banner found');
 
   // Caching headers.
-  var foundCacheHeader = false;
-  casp.currentResponse.headers.forEach(function(header) {
-    if (header.name == 'Cache-Control') {
-      foundCacheHeader = true;
-      casp.test.assertMatch(header.value, /public, max-age=\d{3,}/, 'Page is cacheable in Varnish and Akamai');
-      var cacheSecondsMatches = header.value.match(/max-age=(\d+)/);
-      if (cacheSecondsMatches.length > 1) {
-        var cacheSeconds = parseInt(cacheSecondsMatches[1], 10);
-        if (cacheSeconds >= 300) {
-          casp.test.pass('Page cache lifetime is >= than 5 minutes (' + cacheSeconds + ' seconds)');
-        }
-        else {
-          casp.test.fail('Page cache lifetime is < than 5 minutes (' + cacheSeconds + ' seconds)');
-        }
-      }
-    }
-  });
-  if (!foundCacheHeader) {
-    casp.test.fail('Found no "Cache-Control" header');
-    casp.test.fail('Page cache lifetime is < than 5 minutes');
-  }
+  //var foundCacheHeader = false;
+  //casp.currentResponse.headers.forEach(function(header) {
+  //  if (header.name == 'Cache-Control') {
+  //    foundCacheHeader = true;
+  //    casp.test.assertMatch(header.value, /public, max-age=\d{3,}/, 'Page is cacheable in Varnish and Akamai');
+  //    var cacheSecondsMatches = header.value.match(/max-age=(\d+)/);
+  //    if (cacheSecondsMatches.length > 1) {
+  //      var cacheSeconds = parseInt(cacheSecondsMatches[1], 10);
+  //      if (cacheSeconds >= 300) {
+  //        casp.test.pass('Page cache lifetime is >= than 5 minutes (' + cacheSeconds + ' seconds)');
+  //      }
+  //      else {
+  //        casp.test.fail('Page cache lifetime is < than 5 minutes (' + cacheSeconds + ' seconds)');
+  //      }
+  //    }
+  //  }
+  //});
+  //if (!foundCacheHeader) {
+  //  casp.test.fail('Found no "Cache-Control" header');
+  //  casp.test.fail('Page cache lifetime is < than 5 minutes');
+  //}
 }

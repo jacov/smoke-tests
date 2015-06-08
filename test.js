@@ -26,11 +26,17 @@ casper.on('page.error', function(msg, trace) {
   this.test.fail('JavaScript Error: ' + msg);
 });
 
-// Catch load errors for the page resources.
+// Catch load errors for the page resources. Ignore some assets that we do not
+// care about.
 casper.on('resource.error', function(resource) {
   if (!resource.url.match(/.*google-analytics\.com.*/) &&
     !resource.url.match(/.*fonts\.net.*/) &&
     !resource.url.match(/.*pbs\.twimg\.com.*/) &&
+    !resource.url.match(/.*rubiconproject\.com*/) &&
+    !resource.url.match(/.*\.googlesyndication\.com*/) &&
+    !resource.url.match(/.*doubleclick\.net*/) &&
+    !resource.url.match(/.*ping\.chartbeat.net*/) &&
+    !resource.url.match(/.*moatads\.com*/) &&
     !resource.url.match(/.*twitter\.com.*/)
   ) {
     this.echo(resource.url + " not found.", "RED_BAR");
@@ -54,7 +60,7 @@ var sites = casper.cli.get("sites").split(" ");
 var siteURLs = [];
 var limit = casper.cli.get("limit") || 20;
 var timestamp = casper.cli.get("timestamp") || 1;
-var numberOfSuccess = 10 * (limit + 1);
+var numberOfSuccess = 9 * (limit + 1);
 
 casper.each(sites, function (self, site) {
   casper.test.begin('Testing ' + site, numberOfSuccess, function suite(test) {
@@ -72,9 +78,10 @@ casper.each(sites, function (self, site) {
       });
 
       // Add common URLs to the front of the stack.
+      // @todo Jacob to do this.
       var commonUrls = [
-        '/user/login',
-        '/search/government'
+        //'/user/login',
+        //'/search/site/french%20open'
       ];
       Array.prototype.forEach.call(commonUrls, function(link) {
         links.unshift(link);
@@ -91,12 +98,17 @@ casper.each(sites, function (self, site) {
         }
 
         // We have already tested the homepage.
-        else if (link.match(/^\/$/)) {
+        else if (link.match(/^\/?$/)) {
           addLink = false;
         }
 
         // No RSS.
         else if (link.match(/\.xml$/)) {
+          addLink = false;
+        }
+
+        // No query params.
+        else if (link.match(/\/?\?.*/)) {
           addLink = false;
         }
 
